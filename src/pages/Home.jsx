@@ -11,13 +11,15 @@ import {
   Sparkles,
   BookOpen,
   Target,
-  Shield
+  Shield,
+  AlertTriangle
 } from 'lucide-react';
 import ExperienceCard from '../components/ExperienceCard';
 import { GridSkeleton } from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
 import { getAllExperiences } from '../services/experiences';
 import { useAuth } from '../contexts/AuthContext';
+import { isFirebaseConfigured } from '../services/firebase';
 
 export default function Home() {
   const { currentUser } = useAuth();
@@ -53,6 +55,24 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50/50 via-white to-white">
+      {/* Demo Mode Notice */}
+      {!isFirebaseConfigured && (
+        <div className="bg-amber-50 border-b border-amber-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center gap-2 text-amber-800">
+              <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+              <p className="text-sm">
+                <strong>Demo Mode:</strong> Firebase is not configured. Showing sample data. 
+                <a href="https://github.com/ishreyasrivastava/PlaceLog#2-set-up-firebase" 
+                   className="underline ml-1 hover:text-amber-900" target="_blank" rel="noopener noreferrer">
+                  Set up Firebase
+                </a> to enable all features.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10" />
