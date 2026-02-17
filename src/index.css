@@ -38,11 +38,12 @@
   backdrop-filter: blur(24px);
   border: 1px solid rgb(255 255 255 / 0.2);
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.03);
-}
-@utility glass:where(.dark *) {
-  background: rgb(17 24 39 / 0.6);
-  border-color: rgb(55 65 81 / 0.3);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+
+  :where(.dark, .dark *) & {
+    background: rgb(17 24 39 / 0.6);
+    border-color: rgb(55 65 81 / 0.3);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  }
 }
 
 @layer components {
