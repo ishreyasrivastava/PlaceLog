@@ -1,261 +1,119 @@
-import { 
-  collection, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  doc, 
-  query, 
-  where, 
-  orderBy, 
-  getDocs,
-  getDoc,
-  serverTimestamp 
-} from 'firebase/firestore';
-import { db, isFirebaseConfigured } from './firebase';
-
-const COLLECTION = 'experiences';
-
-// Demo data for when Firebase isn't configured
-const DEMO_EXPERIENCES = [
-  {
-    id: 'demo-1',
-    company: 'Google',
-    role: 'Software Engineer',
-    year: '2026',
-    outcome: 'Selected',
-    interviewType: 'On-Campus',
-    difficulty: 'Hard',
-    rounds: 5,
-    questions: [
-      'Design a URL shortener system',
-      'Implement LRU Cache',
-      'Find the median of two sorted arrays'
-    ],
-    tips: 'Focus on system design and practice LeetCode hard problems. Communication is key!',
-    experience: 'The interview process started with an online coding round with 3 problems. Then there were 2 technical rounds focusing on DSA and system design, followed by a behavioral round.',
-    ctcOffered: '45 LPA',
-    authorName: 'Demo User',
-    authorCollege: 'Demo College',
-    authorBatch: '2026',
-    userId: 'demo-user',
-    createdAt: { toDate: () => new Date('2026-01-15') }
-  },
-  {
-    id: 'demo-2',
-    company: 'Microsoft',
-    role: 'Software Developer',
-    year: '2026',
-    outcome: 'Selected',
-    interviewType: 'On-Campus',
-    difficulty: 'Medium',
-    rounds: 4,
-    questions: [
-      'Reverse a linked list',
-      'Design a parking lot system',
-      'Binary tree level order traversal'
-    ],
-    tips: 'Be thorough with your basics. Practice explaining your thought process out loud.',
-    experience: 'Great experience overall. The interviewers were friendly and helpful. Focus on problem-solving approach rather than just the solution.',
-    ctcOffered: '42 LPA',
-    authorName: 'Demo User 2',
-    authorCollege: 'Demo College',
-    authorBatch: '2026',
-    userId: 'demo-user-2',
-    createdAt: { toDate: () => new Date('2026-01-20') }
-  },
-  {
-    id: 'demo-3',
-    company: 'Amazon',
-    role: 'SDE-1',
-    year: '2025',
-    outcome: 'Rejected',
-    interviewType: 'Off-Campus',
-    difficulty: 'Hard',
-    rounds: 4,
-    questions: [
-      'Tell me about a time you had a conflict with a teammate',
-      'Design a rate limiter',
-      'Find all anagrams in a string'
-    ],
-    tips: 'Amazon focuses heavily on Leadership Principles. Prepare STAR format stories for behavioral questions.',
-    experience: 'The behavioral round was challenging. Make sure to prepare specific examples from your projects.',
-    ctcOffered: '-',
-    authorName: 'Demo User 3',
-    authorCollege: 'Demo College',
-    authorBatch: '2025',
-    userId: 'demo-user-3',
-    createdAt: { toDate: () => new Date('2025-12-10') }
-  }
-];
+import { supabase } from '../lib/supabase';
 
 export async function createExperience(data, userId, userProfile) {
-  if (!isFirebaseConfigured || !db) {
-    throw new Error('Firebase is not configured. Please set up Firebase to create experiences.');
-  }
-
   const experience = {
-    ...data,
-    userId,
-    authorName: userProfile?.displayName || 'Anonymous',
-    authorCollege: userProfile?.college || 'Unknown College',
-    authorBatch: userProfile?.batch || 'Unknown Batch',
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
+    user_id: userId,
+    company: data.company,
+    role: data.role,
+    year: data.year,
+    outcome: data.outcome,
+    interview_type: data.interviewType,
+    difficulty: data.difficulty || null,
+    rounds: data.rounds || null,
+    questions: data.questions?.filter(q => q.trim()) || [],
+    tips: data.tips || null,
+    experience: data.experience,
+    ctc_offered: data.ctcOffered || null,
+    author_name: userProfile?.display_name || 'Anonymous',
+    author_college: userProfile?.college || 'Unknown College',
+    author_batch: userProfile?.batch || 'Unknown Batch'
   };
-  
-  const docRef = await addDoc(collection(db, COLLECTION), experience);
-  return { id: docRef.id, ...experience };
+
+  const { data: result, error } = await supabase
+    .from('experiences')
+    .insert(experience)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return mapExperience(result);
 }
 
 export async function updateExperience(id, data) {
-  if (!isFirebaseConfigured || !db) {
-    throw new Error('Firebase is not configured.');
-  }
+  const updateData = {
+    company: data.company,
+    role: data.role,
+    year: data.year,
+    outcome: data.outcome,
+    interview_type: data.interviewType,
+    difficulty: data.difficulty || null,
+    rounds: data.rounds || null,
+    questions: data.questions?.filter(q => q.trim()) || [],
+    tips: data.tips || null,
+    experience: data.experience,
+    ctc_offered: data.ctcOffered || null
+  };
 
-  const docRef = doc(db, COLLECTION, id);
-  await updateDoc(docRef, {
-    ...data,
-    updatedAt: serverTimestamp()
-  });
+  const { error } = await supabase.from('experiences').update(updateData).eq('id', id);
+  if (error) throw error;
 }
 
 export async function deleteExperience(id) {
-  if (!isFirebaseConfigured || !db) {
-    throw new Error('Firebase is not configured.');
-  }
-
-  const docRef = doc(db, COLLECTION, id);
-  await deleteDoc(docRef);
+  const { error } = await supabase.from('experiences').delete().eq('id', id);
+  if (error) throw error;
 }
 
 export async function getExperience(id) {
-  // Return demo experience if not configured
-  if (!isFirebaseConfigured || !db) {
-    return DEMO_EXPERIENCES.find(exp => exp.id === id) || null;
-  }
-
-  const docRef = doc(db, COLLECTION, id);
-  const docSnap = await getDoc(docRef);
-  
-  if (docSnap.exists()) {
-    return { id: docSnap.id, ...docSnap.data() };
-  }
-  return null;
+  const { data, error } = await supabase.from('experiences').select('*').eq('id', id).single();
+  if (error) return null;
+  return mapExperience(data);
 }
 
 export async function getAllExperiences() {
-  // Return demo data if Firebase is not configured
-  if (!isFirebaseConfigured || !db) {
-    return DEMO_EXPERIENCES;
-  }
-
-  const q = query(
-    collection(db, COLLECTION),
-    orderBy('createdAt', 'desc')
-  );
-  
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
+  const { data, error } = await supabase
+    .from('experiences')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(mapExperience);
 }
 
 export async function getUserExperiences(userId) {
-  // Return empty for demo mode
-  if (!isFirebaseConfigured || !db) {
-    return DEMO_EXPERIENCES.filter(exp => exp.userId === userId);
-  }
-
-  const q = query(
-    collection(db, COLLECTION),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc')
-  );
-  
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
+  const { data, error } = await supabase
+    .from('experiences')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(mapExperience);
 }
 
 export async function searchExperiences(filters) {
-  // Use demo data if not configured
-  if (!isFirebaseConfigured || !db) {
-    let results = [...DEMO_EXPERIENCES];
-    
-    if (filters.company) {
-      results = results.filter(exp => 
-        exp.company.toLowerCase().includes(filters.company.toLowerCase())
-      );
-    }
-    
-    if (filters.role) {
-      results = results.filter(exp => 
-        exp.role.toLowerCase().includes(filters.role.toLowerCase())
-      );
-    }
-    
-    if (filters.year) {
-      results = results.filter(exp => exp.year === filters.year);
-    }
-    
-    if (filters.outcome) {
-      results = results.filter(exp => exp.outcome === filters.outcome);
-    }
-    
-    if (filters.interviewType) {
-      results = results.filter(exp => exp.interviewType === filters.interviewType);
-    }
-    
-    return results;
-  }
+  let query = supabase.from('experiences').select('*').order('created_at', { ascending: false });
 
-  // Start with base query
-  let q = query(collection(db, COLLECTION));
-  
-  // Note: Firestore has limitations on compound queries
-  // We'll fetch all and filter client-side for flexibility
-  const querySnapshot = await getDocs(q);
-  let results = querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
-  
-  // Client-side filtering
-  if (filters.company) {
-    results = results.filter(exp => 
-      exp.company.toLowerCase().includes(filters.company.toLowerCase())
-    );
-  }
-  
-  if (filters.role) {
-    results = results.filter(exp => 
-      exp.role.toLowerCase().includes(filters.role.toLowerCase())
-    );
-  }
-  
-  if (filters.year) {
-    results = results.filter(exp => exp.year === filters.year);
-  }
-  
-  if (filters.outcome) {
-    results = results.filter(exp => exp.outcome === filters.outcome);
-  }
-  
-  if (filters.interviewType) {
-    results = results.filter(exp => exp.interviewType === filters.interviewType);
-  }
-  
-  // Sort by date (newest first)
-  results.sort((a, b) => {
-    const dateA = a.createdAt?.toDate?.() || new Date(a.createdAt);
-    const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt);
-    return dateB - dateA;
-  });
-  
-  return results;
+  if (filters.company) query = query.ilike('company', `%${filters.company}%`);
+  if (filters.role) query = query.ilike('role', `%${filters.role}%`);
+  if (filters.year) query = query.eq('year', filters.year);
+  if (filters.outcome) query = query.eq('outcome', filters.outcome);
+  if (filters.interviewType) query = query.eq('interview_type', filters.interviewType);
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data || []).map(mapExperience);
+}
+
+function mapExperience(exp) {
+  if (!exp) return null;
+  return {
+    id: exp.id,
+    userId: exp.user_id,
+    company: exp.company,
+    role: exp.role,
+    year: exp.year,
+    outcome: exp.outcome,
+    interviewType: exp.interview_type,
+    difficulty: exp.difficulty,
+    rounds: exp.rounds,
+    questions: exp.questions || [],
+    tips: exp.tips,
+    experience: exp.experience,
+    ctcOffered: exp.ctc_offered,
+    authorName: exp.author_name,
+    authorCollege: exp.author_college,
+    authorBatch: exp.author_batch,
+    createdAt: exp.created_at,
+    updatedAt: exp.updated_at
+  };
 }
 
 export const COMPANIES = [
@@ -280,14 +138,7 @@ export const ROLES = [
   'Other'
 ];
 
-export const INTERVIEW_TYPES = [
-  'On-Campus', 'Off-Campus', 'Referral', 'Direct Apply', 'Pool Campus'
-];
-
-export const OUTCOMES = [
-  'Selected', 'Rejected', 'Waitlisted', 'In Progress'
-];
-
+export const INTERVIEW_TYPES = ['On-Campus', 'Off-Campus', 'Referral', 'Direct Apply', 'Pool Campus'];
+export const OUTCOMES = ['Selected', 'Rejected', 'Waitlisted', 'In Progress'];
 export const YEARS = ['2024', '2025', '2026', '2027', '2028'];
-
 export const DIFFICULTY_LEVELS = ['Easy', 'Medium', 'Hard'];

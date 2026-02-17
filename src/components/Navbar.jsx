@@ -1,287 +1,100 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  BookOpen, 
-  Plus, 
-  User, 
-  LogOut, 
-  Menu, 
-  X,
-  Search,
-  Home,
-  ChevronDown
-} from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
+import { BookOpen, Search, Plus, User, LogOut, Menu, X, Sun, Moon, LogIn, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Navbar() {
   const { currentUser, logout } = useAuth();
-  const navigate = useNavigate();
+  const { darkMode, toggleTheme } = useTheme();
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
-  // Handle scroll for navbar background
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const handleLogout = async () => {
+    try { await logout(); toast.success('Logged out'); navigate('/'); } catch { toast.error('Failed to log out'); }
+    setOpen(false);
+  };
 
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
-
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [mobileMenuOpen]);
-
-  const handleLogout = useCallback(async () => {
-    if (loggingOut) return;
-    setLoggingOut(true);
-    try {
-      await logout();
-      toast.success('Logged out successfully');
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast.error('Failed to log out');
-    } finally {
-      setLoggingOut(false);
-    }
-  }, [logout, navigate, loggingOut]);
-
-  const isActive = (path) => location.pathname === path;
+  const isActive = (p) => location.pathname === p;
+  const links = [
+    { path: '/explore', label: 'Explore', icon: Search },
+    ...(currentUser ? [{ path: '/share', label: 'Share', icon: Plus }, { path: '/profile', label: 'Profile', icon: User }] : []),
+  ];
 
   return (
-    <>
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled 
-            ? 'glass shadow-lg shadow-indigo-500/5' 
-            : 'bg-transparent'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16 md:h-20">
-            {/* Logo */}
-            <Link 
-              to="/" 
-              className="flex items-center gap-3 group"
-              aria-label="PlaceLog Home"
-            >
-              <motion.div 
-                whileHover={{ scale: 1.05, rotate: -5 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-10 h-10 md:w-11 md:h-11 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30"
-              >
-                <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-white" />
-              </motion.div>
-              <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                PlaceLog
-              </span>
-            </Link>
+    <nav className="glass-navbar sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center shadow-md shadow-brand-500/20">
+              <BookOpen className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-lg font-bold text-gray-900 dark:text-white">Place<span className="text-gradient">Log</span></span>
+          </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-1">
-              <NavLink to="/" active={isActive('/')}>
-                <Home className="w-4 h-4" />
-                Home
-              </NavLink>
-              <NavLink to="/explore" active={isActive('/explore')}>
-                <Search className="w-4 h-4" />
-                Explore
-              </NavLink>
-              
+          <div className="hidden md:flex items-center gap-1">
+            {links.map(({ path, label, icon: Icon }) => (
+              <Link key={path} to={path} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${isActive(path) ? 'bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50'}`}>
+                <Icon className="w-4 h-4" />{label}
+              </Link>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button onClick={toggleTheme} className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all" aria-label="Toggle theme">
+              <AnimatePresence mode="wait" initial={false}>
+                {darkMode ? (
+                  <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}><Sun className="w-5 h-5" /></motion.div>
+                ) : (
+                  <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}><Moon className="w-5 h-5" /></motion.div>
+                )}
+              </AnimatePresence>
+            </button>
+
+            <div className="hidden md:flex items-center gap-2">
               {currentUser ? (
-                <>
-                  <NavLink to="/share" active={isActive('/share')}>
-                    <Plus className="w-4 h-4" />
-                    Share
-                  </NavLink>
-                  <NavLink to="/profile" active={isActive('/profile')}>
-                    <User className="w-4 h-4" />
-                    Profile
-                  </NavLink>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleLogout}
-                    disabled={loggingOut}
-                    className="flex items-center gap-2 px-4 py-2.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all ml-2 disabled:opacity-50"
-                    aria-label="Logout"
-                  >
-                    <LogOut className={`w-4 h-4 ${loggingOut ? 'animate-spin' : ''}`} />
-                    {loggingOut ? 'Logging out...' : 'Logout'}
-                  </motion.button>
-                </>
+                <button onClick={handleLogout} className="btn-ghost text-sm"><LogOut className="w-4 h-4" />Logout</button>
               ) : (
                 <>
-                  <NavLink to="/login" active={isActive('/login')}>
-                    Login
-                  </NavLink>
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Link
-                      to="/signup"
-                      className="ml-3 px-5 py-2.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all"
-                    >
-                      Sign Up Free
-                    </Link>
-                  </motion.div>
+                  <Link to="/login" className="btn-ghost text-sm"><LogIn className="w-4 h-4" />Sign In</Link>
+                  <Link to="/signup" className="btn-primary text-sm !px-4 !py-2"><Sparkles className="w-4 h-4" />Join Free</Link>
                 </>
               )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2.5 rounded-xl hover:bg-gray-100 transition-colors"
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={mobileMenuOpen}
-            >
-              {mobileMenuOpen ? (
-                <X className="w-6 h-6 text-gray-700" />
-              ) : (
-                <Menu className="w-6 h-6 text-gray-700" />
-              )}
-            </motion.button>
+            <button onClick={() => setOpen(!open)} className="md:hidden p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
+              {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
-      </motion.nav>
+      </div>
 
-      {/* Mobile Menu Overlay */}
       <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
-            />
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed top-16 left-4 right-4 bg-white rounded-2xl shadow-2xl z-50 md:hidden overflow-hidden"
-            >
-              <nav className="p-3 space-y-1">
-                <MobileNavLink to="/" onClick={() => setMobileMenuOpen(false)} active={isActive('/')}>
-                  <Home className="w-5 h-5" />
-                  Home
-                </MobileNavLink>
-                <MobileNavLink to="/explore" onClick={() => setMobileMenuOpen(false)} active={isActive('/explore')}>
-                  <Search className="w-5 h-5" />
-                  Explore
-                </MobileNavLink>
-                
+        {open && (
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="md:hidden border-t border-gray-200/50 dark:border-gray-800/50 overflow-hidden">
+            <div className="px-4 py-4 space-y-1 bg-white/90 dark:bg-gray-950/90 backdrop-blur-xl">
+              {links.map(({ path, label, icon: Icon }) => (
+                <Link key={path} to={path} onClick={() => setOpen(false)} className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive(path) ? 'bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400' : 'text-gray-600 dark:text-gray-400'}`}>
+                  <Icon className="w-5 h-5" />{label}
+                </Link>
+              ))}
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-800">
                 {currentUser ? (
-                  <>
-                    <MobileNavLink to="/share" onClick={() => setMobileMenuOpen(false)} active={isActive('/share')}>
-                      <Plus className="w-5 h-5" />
-                      Share Experience
-                    </MobileNavLink>
-                    <MobileNavLink to="/profile" onClick={() => setMobileMenuOpen(false)} active={isActive('/profile')}>
-                      <User className="w-5 h-5" />
-                      My Profile
-                    </MobileNavLink>
-                    <div className="pt-2 mt-2 border-t border-gray-100">
-                      <button
-                        onClick={() => {
-                          handleLogout();
-                          setMobileMenuOpen(false);
-                        }}
-                        disabled={loggingOut}
-                        className="w-full flex items-center gap-3 px-4 py-3.5 text-red-600 hover:bg-red-50 rounded-xl transition-colors disabled:opacity-50"
-                      >
-                        <LogOut className="w-5 h-5" />
-                        {loggingOut ? 'Logging out...' : 'Logout'}
-                      </button>
-                    </div>
-                  </>
+                  <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400"><LogOut className="w-5 h-5" />Logout</button>
                 ) : (
-                  <>
-                    <MobileNavLink to="/login" onClick={() => setMobileMenuOpen(false)} active={isActive('/login')}>
-                      Login
-                    </MobileNavLink>
-                    <div className="pt-2 mt-2 border-t border-gray-100">
-                      <Link
-                        to="/signup"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="block text-center px-4 py-3.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-semibold rounded-xl"
-                      >
-                        Sign Up Free
-                      </Link>
-                    </div>
-                  </>
+                  <div className="space-y-2">
+                    <Link to="/login" onClick={() => setOpen(false)} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">Sign In</Link>
+                    <Link to="/signup" onClick={() => setOpen(false)} className="w-full btn-primary text-sm !py-3"><Sparkles className="w-4 h-4" />Join Free</Link>
+                  </div>
                 )}
-              </nav>
-            </motion.div>
-          </>
+              </div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Spacer for fixed navbar */}
-      <div className="h-16 md:h-20" />
-    </>
-  );
-}
-
-function NavLink({ to, active, children }) {
-  return (
-    <Link
-      to={to}
-      className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
-        active
-          ? 'text-indigo-600 bg-indigo-50'
-          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-      }`}
-    >
-      {children}
-      {active && (
-        <motion.div
-          layoutId="activeNav"
-          className="absolute inset-0 bg-indigo-50 rounded-xl -z-10"
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        />
-      )}
-    </Link>
-  );
-}
-
-function MobileNavLink({ to, onClick, active, children }) {
-  return (
-    <Link
-      to={to}
-      onClick={onClick}
-      className={`flex items-center gap-3 px-4 py-3.5 rounded-xl font-medium transition-colors ${
-        active
-          ? 'text-indigo-600 bg-indigo-50'
-          : 'text-gray-700 hover:bg-gray-50'
-      }`}
-    >
-      {children}
-    </Link>
+    </nav>
   );
 }
