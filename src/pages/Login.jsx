@@ -21,7 +21,7 @@ export default function Login() {
     if (!email || !password) { setError('Please fill in all fields'); return; }
     setLoading(true);
     try { await login(email, password); toast.success('Welcome back!'); navigate(from, { replace: true }); }
-    catch (err) { setError(err.message || 'Failed to sign in.'); }
+    catch (err) { setError(err.message || 'Failed to login.'); }
     finally { setLoading(false); }
   }, [email, password, login, navigate, from]);
 
@@ -41,7 +41,7 @@ export default function Login() {
           </div>
           <div className="text-center mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back</h1>
-            <p className="text-gray-500 dark:text-gray-400">Sign in to continue to PlaceLog</p>
+            <p className="text-gray-500 dark:text-gray-400">Login to continue to PlaceLog</p>
           </div>
 
           {error && (
@@ -70,7 +70,7 @@ export default function Login() {
             </div>
             <div className="flex justify-end"><Link to="/forgot-password" className="text-sm text-brand-600 dark:text-brand-400 font-medium">Forgot password?</Link></div>
             <button type="submit" disabled={loading} className="w-full btn-primary !py-3.5">
-              {loading ? <><Loader2 className="w-5 h-5 animate-spin" />Signing in...</> : <><LogIn className="w-5 h-5" />Sign In</>}
+              {loading ? <><Loader2 className="w-5 h-5 animate-spin" />Signing in...</> : <><LogIn className="w-5 h-5" />Login</>}
             </button>
           </form>
 

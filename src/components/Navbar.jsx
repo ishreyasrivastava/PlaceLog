@@ -59,7 +59,7 @@ export default function Navbar() {
                 <button onClick={handleLogout} className="btn-ghost text-sm"><LogOut className="w-4 h-4" />Logout</button>
               ) : (
                 <>
-                  <Link to="/login" className="btn-ghost text-sm"><LogIn className="w-4 h-4" />Sign In</Link>
+                  <Link to="/login" className="btn-ghost text-sm"><LogIn className="w-4 h-4" />Login</Link>
                   <Link to="/signup" className="btn-primary text-sm !px-4 !py-2"><Sparkles className="w-4 h-4" />Join Free</Link>
                 </>
               )}
@@ -86,7 +86,7 @@ export default function Navbar() {
                   <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400"><LogOut className="w-5 h-5" />Logout</button>
                 ) : (
                   <div className="space-y-2">
-                    <Link to="/login" onClick={() => setOpen(false)} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">Sign In</Link>
+                    <Link to="/login" onClick={() => setOpen(false)} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">Login</Link>
                     <Link to="/signup" onClick={() => setOpen(false)} className="w-full btn-primary text-sm !py-3"><Sparkles className="w-4 h-4" />Join Free</Link>
                   </div>
                 )}

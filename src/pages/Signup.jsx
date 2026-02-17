@@ -113,7 +113,7 @@ export default function Signup() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-gray-500 dark:text-gray-400">Already have an account? <Link to="/login" className="text-brand-600 dark:text-brand-400 font-semibold">Sign in</Link></p>
+          <p className="mt-8 text-center text-gray-500 dark:text-gray-400">Already have an account? <Link to="/login" className="text-brand-600 dark:text-brand-400 font-semibold">Login</Link></p>
         </div>
       </motion.div>
     </div>
