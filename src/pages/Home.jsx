@@ -69,25 +69,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="py-12 md:py-16 bg-white dark:bg-gray-900/50 border-y border-gray-100 dark:border-gray-800/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { icon: BookOpen, value: stats.total, label: 'Experiences', color: 'brand' },
-              { icon: Building2, value: stats.companies, label: 'Companies', color: 'violet' },
-              { icon: Award, value: stats.selected, label: 'Success Stories', color: 'emerald' },
-              { icon: Users, value: '50+', label: 'Active Students', color: 'blue' },
-            ].map(({ icon: Icon, value, label }, i) => (
-              <motion.div key={label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="text-center">
-                <div className="w-14 h-14 mx-auto rounded-2xl bg-brand-100 dark:bg-brand-950/50 flex items-center justify-center mb-4"><Icon className="w-7 h-7 text-brand-600 dark:text-brand-400" /></div>
-                <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{value}</div>
-                <div className="text-gray-500 dark:text-gray-400 font-medium">{label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Stats removed */}
 
       {/* Features */}
       <section className="py-16 md:py-24 page-bg">
