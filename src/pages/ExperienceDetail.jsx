@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ArrowLeft, Building2, Briefcase, Calendar, User, GraduationCap, CheckCircle2, XCircle, Hourglass, TrendingUp, HelpCircle, Lightbulb, Clock, Edit2, Trash2, AlertCircle, Loader2, DollarSign } from 'lucide-react';
 import { getExperience, deleteExperience } from '../services/experiences';
 import { useAuth } from '../contexts/AuthContext';
@@ -48,12 +47,12 @@ export default function ExperienceDetail() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link to="/explore" className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-6"><ArrowLeft className="w-4 h-4" />Back to Explore</Link>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div>
           {/* Header */}
           <div className={`glass-card p-6 md:p-8 mb-6 border ${o.border}`}>
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-brand-500 to-violet-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">{exp.company.charAt(0)}</div>
+                <div className="w-14 h-14 bg-brand-100 dark:bg-brand-950/50 rounded-xl flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-2xl">{exp.company.charAt(0)}</div>
                 <div>
                   <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">{exp.company}</h1>
                   <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-1"><Briefcase className="w-4 h-4" />{exp.role}</p>
@@ -100,10 +99,10 @@ export default function ExperienceDetail() {
             <div className="glass-card p-6 md:p-8 mb-6">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2"><HelpCircle className="w-5 h-5 text-brand-500" />Questions Asked</h2>
               <ul className="space-y-3">{exp.questions.filter(q => q.trim()).map((q, i) => (
-                <motion.li key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }} className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+                <li key={i} className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
                   <span className="flex-shrink-0 w-6 h-6 bg-brand-100 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center text-sm font-medium">{i + 1}</span>
                   <span className="text-gray-700 dark:text-gray-300">{q}</span>
-                </motion.li>
+                </li>
               ))}</ul>
             </div>
           )}
@@ -111,17 +110,17 @@ export default function ExperienceDetail() {
           {/* Tips */}
           {exp.tips && (
             <div className="glass-card p-6 md:p-8 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200/50 dark:border-amber-800/30">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2"><Lightbulb className="w-5 h-5 text-amber-500" />Tips for Future Candidates</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2"><Lightbulb className="w-5 h-5 text-amber-500" />Tips</h2>
               <div className="prose dark:prose-invert max-w-none">{exp.tips.split('\n').map((p, i) => <p key={i} className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{p}</p>)}</div>
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
 
       {/* Delete Modal */}
       {showDelete && (
         <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-6 max-w-md w-full">
+          <div className="glass-card p-6 max-w-md w-full">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-red-100 dark:bg-red-950/50 rounded-full flex items-center justify-center"><AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400" /></div>
               <div><h3 className="text-lg font-semibold text-gray-900 dark:text-white">Delete?</h3><p className="text-gray-500 dark:text-gray-400 text-sm">This can't be undone.</p></div>
@@ -132,7 +131,7 @@ export default function ExperienceDetail() {
                 {deleting ? <><Loader2 className="w-4 h-4 animate-spin" />Deleting...</> : <><Trash2 className="w-4 h-4" />Delete</>}
               </button>
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
     </div>

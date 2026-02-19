@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle, Loader2, BookOpen, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -27,27 +26,19 @@ export default function Login() {
 
   return (
     <div className="page-bg flex items-center justify-center px-4 py-12">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-300 dark:bg-brand-600 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 animate-blob" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-300 dark:bg-violet-600 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-      </div>
-
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative w-full max-w-md">
+      <div className="w-full max-w-md">
         <Link to="/" className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-6"><ArrowLeft className="w-4 h-4" />Back to home</Link>
 
-        <div className="glass-card p-8 md:p-10">
-          <div className="flex justify-center mb-6">
-            <div className="w-14 h-14 bg-gradient-to-br from-brand-500 to-violet-500 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-500/30"><BookOpen className="w-7 h-7 text-white" /></div>
-          </div>
+        <div className="glass-card p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back</h1>
-            <p className="text-gray-500 dark:text-gray-400">Login to continue to PlaceLog</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Login</h1>
+            <p className="text-gray-500 dark:text-gray-400">Sign in to PlaceLog</p>
           </div>
 
           {error && (
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/50 rounded-xl flex items-start gap-3">
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/50 rounded-xl flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" /><p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
-            </motion.div>
+            </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -74,10 +65,10 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="relative my-8"><div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200 dark:border-gray-700" /></div><div className="relative flex justify-center text-sm"><span className="px-4 bg-white/70 dark:bg-gray-900/60 text-gray-500 dark:text-gray-400">New to PlaceLog?</span></div></div>
+          <div className="relative my-8"><div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200 dark:border-gray-700" /></div><div className="relative flex justify-center text-sm"><span className="px-4 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400">New here?</span></div></div>
           <Link to="/signup" className="block w-full text-center py-3.5 btn-secondary">Create an account</Link>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

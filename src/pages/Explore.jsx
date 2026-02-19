@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, SlidersHorizontal, RotateCcw, ChevronDown, Sparkles } from 'lucide-react';
+import { Search, X, SlidersHorizontal, RotateCcw, ChevronDown } from 'lucide-react';
 import ExperienceCard from '../components/ExperienceCard';
 import { GridSkeleton } from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
@@ -39,15 +38,12 @@ export default function Explore() {
   return (
     <div className="page-bg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center"><Sparkles className="w-5 h-5 text-white" /></div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Explore Experiences</h1>
-          </div>
-          <p className="text-gray-600 dark:text-gray-400 text-lg">Find interview experiences by company, role, or year</p>
-        </motion.div>
+        <div className="mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1">Explore Experiences</h1>
+          <p className="text-gray-600 dark:text-gray-400">Find interview experiences by company, role, or year</p>
+        </div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-4 md:p-6 mb-8">
+        <div className="glass-card p-4 md:p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -65,22 +61,22 @@ export default function Explore() {
               {hasFilters && <button onClick={clearAll} className="btn-ghost text-sm"><RotateCcw className="w-4 h-4" />Clear</button>}
             </div>
           </div>
-          <AnimatePresence>{showFilters && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="lg:hidden mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 overflow-hidden">
+          {showFilters && (
+            <div className="lg:hidden mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="grid grid-cols-2 gap-3">
                 <FilterSelect label="Year" value={filters.year} onChange={v => setFilter('year', v)} options={YEARS} full />
                 <FilterSelect label="Outcome" value={filters.outcome} onChange={v => setFilter('outcome', v)} options={OUTCOMES} full />
                 <FilterSelect label="Type" value={filters.interviewType} onChange={v => setFilter('interviewType', v)} options={INTERVIEW_TYPES} full />
               </div>
               {hasFilters && <button onClick={clearAll} className="w-full mt-4 btn-ghost"><RotateCcw className="w-4 h-4" />Clear All</button>}
-            </motion.div>
-          )}</AnimatePresence>
-        </motion.div>
+            </div>
+          )}
+        </div>
 
         {!loading && !error && <p className="text-gray-500 dark:text-gray-400 mb-6 font-medium">{experiences.length} experience{experiences.length !== 1 ? 's' : ''} found</p>}
 
         {loading ? <GridSkeleton count={9} /> : error ? <EmptyState variant="error" onRetry={fetch} /> : experiences.length === 0 ? <EmptyState variant={hasFilters ? 'no-results' : 'no-experiences'} /> : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{experiences.map((e, i) => <ExperienceCard key={e.id} experience={e} index={i} />)}</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{experiences.map((e) => <ExperienceCard key={e.id} experience={e} />)}</div>
         )}
       </div>
     </div>
