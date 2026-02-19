@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { getExperience, updateExperience, COMPANIES, ROLES, YEARS, OUTCOMES, INTERVIEW_TYPES, DIFFICULTY_LEVELS } from '../services/experiences';
 import { Building2, Briefcase, Calendar, CheckCircle2, HelpCircle, Lightbulb, AlertCircle, Loader2, Plus, Trash2, ChevronDown, ArrowLeft } from 'lucide-react';
@@ -61,14 +62,14 @@ export default function EditExperience() {
     <div className="page-bg py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link to={`/experience/${id}`} className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-6"><ArrowLeft className="w-4 h-4" />Back</Link>
-        <div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Edit Experience</h1>
             <p className="text-gray-600 dark:text-gray-400">Update your interview experience</p>
           </div>
 
           <div className="glass-card p-6 md:p-8">
-            {error && <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/50 rounded-xl flex items-start gap-3"><AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" /><p className="text-red-600 dark:text-red-400 text-sm">{error}</p></div>}
+            {error && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/50 rounded-xl flex items-start gap-3"><AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" /><p className="text-red-600 dark:text-red-400 text-sm">{error}</p></motion.div>}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
@@ -103,7 +104,7 @@ export default function EditExperience() {
               </div>
             </form>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

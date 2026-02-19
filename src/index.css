@@ -16,7 +16,19 @@
   --color-brand-900: #312e81;
   --color-brand-950: #1e1b4b;
 
-  /* animations removed */
+  --animate-blob: blob 7s infinite;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes blob {
+    0% { transform: translate(0,0) scale(1); }
+    33% { transform: translate(30px,-50px) scale(1.1); }
+    66% { transform: translate(-20px,20px) scale(0.9); }
+    100% { transform: translate(0,0) scale(1); }
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
 }
 
 @variant dark (&:where(.dark, .dark *));
@@ -46,6 +58,7 @@
   transition: all 0.3s;
   &:hover {
     box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    transform: translateY(-0.25rem);
   }
 }
 
@@ -131,8 +144,8 @@
   color: white;
   box-shadow: 0 10px 15px -3px rgb(99 102 241 / 0.25);
   transition: all 0.2s;
-  &:hover { box-shadow: 0 20px 25px -5px rgb(99 102 241 / 0.3); }
-  &:active { opacity: 0.9; }
+  &:hover { box-shadow: 0 20px 25px -5px rgb(99 102 241 / 0.3); transform: scale(1.02); }
+  &:active { transform: scale(0.98); }
   &:disabled { opacity: 0.5; cursor: not-allowed; &:hover { transform: none; } }
 }
 
@@ -165,7 +178,10 @@
 }
 
 @utility text-gradient {
-  color: #4f46e5;
+  background: linear-gradient(to right, #6366f1, #8b5cf6, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 @utility page-bg {

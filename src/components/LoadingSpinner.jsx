@@ -1,12 +1,13 @@
+import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 
 export function FullPageLoader({ text = 'Loading...' }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center page-bg">
-      <div className="text-center">
+      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
         <Loader2 className="w-10 h-10 animate-spin text-brand-500 mx-auto mb-4" />
         <p className="text-gray-500 dark:text-gray-400 font-medium">{text}</p>
-      </div>
+      </motion.div>
     </div>
   );
 }
